@@ -1,73 +1,79 @@
 #!/bin/bash
 
-# Nome do diretório do ambiente virtual
+# --- Configuration ---
+# Virtual environment directory name
 VENV_DIR=".venv_monitor_net"
-# Nome do script Python a ser executado
+# Python script to execute
 PYTHON_SCRIPT="monitor_net.py"
-# Nome do arquivo de requisitos
+# Requirements file name
 REQUIREMENTS_FILE="requirements.txt"
 
-# Garante que o script opera relativo ao seu próprio local
+# --- Script Setup ---
+# Ensures the script operates relative to its own location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
-# Caminhos completos para os executáveis e arquivos dentro do diretório do script
+# Full paths to executables and files within the script's directory
 VENV_PATH="$SCRIPT_DIR/$VENV_DIR"
-PYTHON_EXEC="$VENV_PATH/bin/python"
-PIP_EXEC="$VENV_PATH/bin/pip"
+PYTHON_EXEC="$VENV_PATH/bin/python" # Path to python interpreter in venv
+PIP_EXEC="$VENV_PATH/bin/pip"       # Path to pip in venv
 SCRIPT_TO_RUN_PATH="$SCRIPT_DIR/$PYTHON_SCRIPT"
 REQUIREMENTS_FILE_PATH="$SCRIPT_DIR/$REQUIREMENTS_FILE"
 
-echo "--- Monitor de Conexão ---"
+# --- Main Script Logic ---
+echo "--- Network Latency Monitor ---"
 
-# 1. Verifica se o Python 3 está disponível
+# 1. Check if Python 3 is available on the system
 if ! command -v python3 &> /dev/null; then
-    echo "ERRO: Python 3 não encontrado. Por favor, instale o Python 3."
+    echo "ERROR: Python 3 not found. Please install Python 3."
     exit 1
 fi
 
-# 2. Cria o ambiente virtual se não existir
+# 2. Create the virtual environment if it doesn't exist
 if [ ! -d "$VENV_PATH" ]; then
-    echo "INFO: Criando ambiente virtual em '$VENV_PATH'..."
+    echo "INFO: Creating virtual environment in '$VENV_PATH'..."
     python3 -m venv "$VENV_PATH"
     if [ $? -ne 0 ]; then
-        echo "ERRO: Falha ao criar o ambiente virtual. Verifique se o pacote 'python3-venv' (ou similar) está instalado."
+        echo "ERROR: Failed to create virtual environment. Check if 'python3-venv' package (or similar) is installed."
         exit 1
     fi
-    echo "INFO: Ambiente virtual criado com sucesso."
+    echo "INFO: Virtual environment created successfully."
 else
-    echo "INFO: Ambiente virtual '$VENV_DIR' já existe."
+    echo "INFO: Virtual environment '$VENV_DIR' already exists."
 fi
 
-# 3. Instala/atualiza as dependências usando o pip do ambiente virtual
-#    Verifica se o requirements.txt existe
+# 3. Install/update dependencies using the virtual environment's pip
+#    First, check if the requirements.txt file exists
 if [ ! -f "$REQUIREMENTS_FILE_PATH" ]; then
-    echo "ERRO: Arquivo '$REQUIREMENTS_FILE' não encontrado em '$SCRIPT_DIR'."
+    echo "ERROR: File '$REQUIREMENTS_FILE' not found in '$SCRIPT_DIR'."
     exit 1
 fi
 
-echo "INFO: Instalando/atualizando dependências de '$REQUIREMENTS_FILE' no ambiente virtual..."
+echo "INFO: Installing/updating dependencies from '$REQUIREMENTS_FILE' in the virtual environment..."
+# "$@" passes all command-line arguments received by run_monitor.sh to pip install (though unlikely to be used by pip here)
+# and more importantly, to the python script later.
 "$PIP_EXEC" install --disable-pip-version-check --no-cache-dir -r "$REQUIREMENTS_FILE_PATH"
 if [ $? -ne 0 ]; then
-    echo "ERRO: Falha ao instalar dependências. Verifique '$REQUIREMENTS_FILE' e sua conexão com a internet."
+    echo "ERROR: Failed to install dependencies. Check '$REQUIREMENTS_FILE' and your internet connection."
     exit 1
 fi
-echo "INFO: Dependências instaladas/atualizadas com sucesso."
+echo "INFO: Dependencies installed/updated successfully."
 
-# 4. Executa o script Python usando o interpretador Python do ambiente virtual
-#    Verifica se o script python existe
+# 4. Execute the Python script using the virtual environment's Python interpreter
+#    First, check if the Python script itself exists
 if [ ! -f "$SCRIPT_TO_RUN_PATH" ]; then
-    echo "ERRO: Script Python '$PYTHON_SCRIPT' não encontrado em '$SCRIPT_DIR'."
+    echo "ERROR: Python script '$PYTHON_SCRIPT' not found in '$SCRIPT_DIR'."
     exit 1
 fi
 
-echo "INFO: Executando o script '$PYTHON_SCRIPT'..."
+echo "INFO: Executing script '$PYTHON_SCRIPT' with arguments: $@" # Display arguments being passed
 echo "--------------------------------------------------"
-# Executa o script python. O stdout/stderr do script python irá para o terminal.
-"$PYTHON_EXEC" "$SCRIPT_TO_RUN_PATH"
+# Execute the python script, passing all arguments received by run_monitor.sh
+# The Python script's stdout/stderr will go to the terminal.
+"$PYTHON_EXEC" "$SCRIPT_TO_RUN_PATH" "$@"
 
-# $? contém o código de saída do último comando executado (o script python)
+# $? contains the exit code of the last executed command (the python script)
 exit_status=$?
 echo "--------------------------------------------------"
-echo "INFO: Script '$PYTHON_SCRIPT' finalizado com código de saída: $exit_status."
+echo "INFO: Script '$PYTHON_SCRIPT' finished with exit code: $exit_status."
 
 exit $exit_status
