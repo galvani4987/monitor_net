@@ -38,23 +38,23 @@ The tool is configurable via command-line arguments for the target host, ping in
 
 1.  **Clone the Repository (or Download Files):**
     If you have Git installed, clone the repository:
-    $$$bash
+    ```bash
     git clone https://github.com/galvani4987/monitor_net.git
     cd monitor_net
-    $$$
+    ```
     Alternatively, download the files (`monitor_net.py`, `run_monitor.sh`, `requirements.txt`) into a directory on your system.
 
 2.  **Navigate to the Project Directory:**
     Open your terminal and change to the directory where you cloned or downloaded the files.
-    $$$bash
+    ```bash
     cd path/to/monitor_net
-    $$$
+    ```
 
 3.  **Make the `run_monitor.sh` Script Executable:**
     This step is crucial for running the setup and application script.
-    $$$bash
+    ```bash
     chmod +x run_monitor.sh
-    $$$
+    ```
 
 ## How to Use
 
@@ -66,15 +66,15 @@ The `run_monitor.sh` script is the recommended way to start the latency monitor.
 
 **Running with Default Settings:**
 To start monitoring with the default settings (pinging `8.8.8.8` every `3` seconds, graph Y-axis reference up to `200ms`, and `6` Y-axis ticks):
-$$$bash
+```bash
 ./run_monitor.sh
-$$$
+```
 
 **Using Command-Line Arguments:**
 You can customize the behavior by passing arguments to `run_monitor.sh`. These arguments are then forwarded to the `monitor_net.py` script.
 
 **Syntax:**
-$$$./run_monitor.sh [host] [-i INTERVAL] [--ymax YMAX] [--yticks YTICKS]$$$
+```./run_monitor.sh [host] [-i INTERVAL] [--ymax YMAX] [--yticks YTICKS]```
 
 **Available Arguments:**
 
@@ -90,19 +90,19 @@ $$$./run_monitor.sh [host] [-i INTERVAL] [--ymax YMAX] [--yticks YTICKS]$$$
 **Examples:**
 
 * Monitor the host `1.1.1.1` with a ping interval of 1.5 seconds:
-    $$$bash
+    ```bash
     ./run_monitor.sh 1.1.1.1 --interval 1.5
-    $$$
+    ```
 
 * Monitor the default host (`8.8.8.8`) with a Y-axis reference up to 100ms and 5 Y-axis ticks:
-    $$$bash
+    ```bash
     ./run_monitor.sh --ymax 100 --yticks 5
-    $$$
+    ```
 
 * Monitor `my.local.gateway` every 0.5 seconds:
-    $$$bash
+    ```bash
     ./run_monitor.sh my.local.gateway -i 0.5
-    $$$
+    ```
 
 **Stopping the Monitor:**
 To stop the script, press `Ctrl+C` in the terminal where it is running.
