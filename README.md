@@ -2,7 +2,7 @@
 
 A Python command-line tool to monitor and graph your internet connection latency in real-time directly in the terminal. This tool is designed for Linux systems.
 
-![Screenshot of Network Monitor](screenshot1.png)
+![Screenshot of Network Monitor](screenshot2.webp)
 
 ## Overview
 
@@ -114,7 +114,7 @@ To stop the script, press `Ctrl+C` in the terminal where it is running.
 * `requirements.txt`: A file listing the Python package dependencies (currently just `plotext`).
 * `README.md`: This file, providing documentation for the project.
 * `.gitignore`: Specifies intentionally untracked files that Git should ignore.
-* `screenshot-001.png`: An example screenshot of the monitor in action.
+* `screenshot*.*`: Example screenshots of the monitor in action.
 
 ## Troubleshooting
 
