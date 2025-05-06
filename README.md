@@ -122,7 +122,7 @@ To stop the script, press `Ctrl+C` in the terminal where it is running.
 * **Graph not displaying well / `WARNING: Calculated plot area is too small...`**: Try increasing the height and width of your terminal window. The script attempts to adapt, but very small terminal sizes can limit graph rendering.
 * **Other Python errors**: Ensure you have Python 3.6+ installed. The `run_monitor.sh` script attempts to use `python3`.
 
-## Contributing (Example Section)
+## Contributing
 
 This is a small personal project, but if you have suggestions or improvements:
 1.  Fork the repository.
