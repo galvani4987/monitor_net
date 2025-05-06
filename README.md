@@ -2,7 +2,7 @@
 
 A Python command-line tool to monitor and graph your internet connection latency in real-time directly in the terminal. This tool is designed for Linux systems.
 
-![Screenshot of Network Monitor](screenshot-001.png)
+![Screenshot of Network Monitor](screenshot1.png)
 
 ## Overview
 
