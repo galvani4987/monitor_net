@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtualenv
+.venv_monitor_net/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
