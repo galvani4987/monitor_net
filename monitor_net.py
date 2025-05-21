@@ -13,8 +13,8 @@ CONSECUTIVE_FAILURES_ALERT_THRESHOLD = 3 # Ping failures to trigger a "connectio
 STATUS_MESSAGE_RESERVED_LINES = 3    # Lines reserved at the top for status messages
 
 # --- Global Configuration Variables (defaults, can be overridden by command-line arguments) ---
-DEFAULT_HOST = '8.8.8.8'
-DEFAULT_PING_INTERVAL_SECONDS = 3.0
+DEFAULT_HOST = '1.1.1.1'
+DEFAULT_PING_INTERVAL_SECONDS = 1.0
 DEFAULT_GRAPH_Y_MAX = 200.0   # Default reference maximum Y-axis value for the graph (ms)
 DEFAULT_Y_TICKS = 6           # Desired number of Y-axis ticks (e.g., 6 ticks = 5 intervals)
 
