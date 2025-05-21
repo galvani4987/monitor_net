@@ -1,111 +1,111 @@
-# Roadmap de Melhorias para o Real-time Network Latency Monitor
+# Improvement Roadmap for the Real-time Network Latency Monitor
 
-Este documento descreve o plano de implementação para as melhorias sugeridas no projeto `monitor_net`. Cada seção representa uma área de melhoria com seus respectivos passos.
+This document outlines the implementation plan for the suggested improvements to the `monitor_net` project. Each section represents an area of improvement with its respective steps.
 
-## Fase 1: Fundações e Estilo
+## Phase 1: Foundations and Style
 
-### 1.1. Consistência de Estilo de Código
-* **Objetivo:** Garantir um código limpo, legível e padronizado.
-* **Ferramentas:** `flake8` para linting, `black` para formatação.
-* **Passos:**
-    * [ ] Instalar `flake8` e `black` no ambiente de desenvolvimento (`pip install flake8 black`).
-    * [ ] Executar `flake8 monitor_net.py` e corrigir todos os avisos e erros reportados.
-    * [ ] Executar `black monitor_net.py` para formatar o código automaticamente.
-    * [ ] Adicionar um arquivo de configuração para `flake8` (ex: `.flake8`) se personalizações forem necessárias.
-    * [ ] Considerar adicionar um hook de pre-commit (ex: com `pre-commit`) para automatizar a verificação de estilo antes de cada commit.
+### 1.1. Code Style Consistency
+* **Objective:** Ensure clean, readable, and standardized code.
+* **Tools:** `flake8` for linting, `black` for formatting.
+* **Steps:**
+    * [ ] Install `flake8` and `black` in the development environment (`pip install flake8 black`).
+    * [ ] Run `flake8 monitor_net.py` and fix all reported warnings and errors.
+    * [ ] Run `black monitor_net.py` to format the code automatically.
+    * [ ] Add a configuration file for `flake8` (e.g., `.flake8`) if customizations are needed.
+    * [ ] Consider adding a pre-commit hook (e.g., with `pre-commit`) to automate style checking before each commit.
 
-### 1.2. Constantes para ANSI Codes e "Magic Numbers"
-* **Objetivo:** Melhorar a legibilidade e manutenibilidade substituindo valores hardcoded por constantes nomeadas.
-* **Arquivo Principal:** `monitor_net.py`
-* **Passos:**
-    * [ ] Identificar todos os códigos de escape ANSI (ex: `\033[H`, `\033[J`, `\033[?25l`, `\033[?25h`) em `monitor_net.py`.
-    * [ ] Definir constantes nomeadas para cada código ANSI no início do script (ex: `ANSI_CURSOR_HOME = "\033[H"`).
-    * [ ] Identificar "números mágicos" (ex: `15` para `overhead_lines`, `MAX_DATA_POINTS = 200`, `CONSECUTIVE_FAILURES_ALERT_THRESHOLD = 3`, `STATUS_MESSAGE_RESERVED_LINES = 3`). Alguns já são constantes, verificar se todos os relevantes estão cobertos.
-    * [ ] Substituir todas as ocorrências dos valores hardcoded pelas constantes definidas.
+### 1.2. Constants for ANSI Codes and "Magic Numbers"
+* **Objective:** Improve readability and maintainability by replacing hardcoded values with named constants.
+* **Main File:** `monitor_net.py`
+* **Steps:**
+    * [ ] Identify all ANSI escape codes (e.g., `\033[H`, `\033[J`, `\033[?25l`, `\033[?25h`) in `monitor_net.py`.
+    * [ ] Define named constants for each ANSI code at the beginning of the script (e.g., `ANSI_CURSOR_HOME = "\033[H"`).
+    * [ ] Identify "magic numbers" (e.g., `15` for `overhead_lines`, `MAX_DATA_POINTS = 200`, `CONSECUTIVE_FAILURES_ALERT_THRESHOLD = 3`, `STATUS_MESSAGE_RESERVED_LINES = 3`). Some are already constants; check if all relevant ones are covered.
+    * [ ] Replace all occurrences of hardcoded values with the defined constants.
 
-## Fase 2: Refatoração Principal
+## Phase 2: Major Refactoring
 
-### 2.1. Encapsulamento com Classes
-* **Objetivo:** Melhorar a organização do código, reduzir o uso de variáveis globais e facilitar testes e extensões futuras.
-* **Arquivo Principal:** `monitor_net.py`
-* **Passos:**
-    * [ ] Definir uma nova classe, por exemplo, `NetworkMonitor`, em `monitor_net.py`.
-    * [ ] Mover as variáveis globais de estado (ex: `latency_plot_values`, `latency_history_real_values`, `consecutive_ping_failures`, `connection_status_message`, `total_monitoring_time_seconds`) para se tornarem atributos de instância da classe (inicializados no `__init__`).
-    * [ ] Mover as variáveis de configuração padrão (ex: `DEFAULT_HOST`, `DEFAULT_PING_INTERVAL_SECONDS`) para se tornarem atributos de classe ou de instância, conforme apropriado. Argumentos de CLI podem atualizar os atributos da instância.
-    * [ ] Converter as funções principais (`measure_latency`, `update_display_and_status`, e a lógica do loop `while True` dentro de `main`) em métodos da classe `NetworkMonitor`.
-    * [ ] O método `__init__` da classe pode receber os argumentos parseados da CLI para configurar a instância.
-    * [ ] A função `main` original será simplificada para:
-        * Parsear os argumentos da CLI.
-        * Instanciar `NetworkMonitor` com esses argumentos.
-        * Chamar um método principal da instância (ex: `monitor.run()`) que contém o loop de monitoramento.
-    * [ ] Garantir que o tratamento de `KeyboardInterrupt` e a restauração do cursor/terminal (`termios`) sejam gerenciados corretamente dentro da classe ou pelo método `run`.
+### 2.1. Encapsulation with Classes
+* **Objective:** Improve code organization, reduce the use of global variables, and facilitate future testing and extensions.
+* **Main File:** `monitor_net.py`
+* **Steps:**
+    * [ ] Define a new class, for example, `NetworkMonitor`, in `monitor_net.py`.
+    * [ ] Move global state variables (e.g., `latency_plot_values`, `latency_history_real_values`, `consecutive_ping_failures`, `connection_status_message`, `total_monitoring_time_seconds`) to become instance attributes of the class (initialized in `__init__`).
+    * [ ] Move default configuration variables (e.g., `DEFAULT_HOST`, `DEFAULT_PING_INTERVAL_SECONDS`) to become class or instance attributes, as appropriate. CLI arguments can update instance attributes.
+    * [ ] Convert main functions (`measure_latency`, `update_display_and_status`, and the `while True` loop logic within `main`) into methods of the `NetworkMonitor` class.
+    * [ ] The class's `__init__` method can receive parsed CLI arguments to configure the instance.
+    * [ ] The original `main` function will be simplified to:
+        * Parse CLI arguments.
+        * Instantiate `NetworkMonitor` with these arguments.
+        * Call a main method of the instance (e.g., `monitor.run()`) that contains the monitoring loop.
+    * [ ] Ensure that `KeyboardInterrupt` handling and cursor/terminal restoration (`termios`) are managed correctly within the class or by the `run` method.
 
-### 2.2. Refatoração de Funções Longas
-* **Objetivo:** Aumentar a clareza e modularidade da função `update_display_and_status` (que se tornará um método de classe).
-* **Método Alvo:** `NetworkMonitor.update_display_and_status` (após refatoração 2.1).
-* **Passos:**
-    * [ ] Analisar o método `update_display_and_status` e identificar blocos lógicos distintos.
-    * [ ] Para cada bloco, criar um novo método privado (prefixado com underscore) dentro da classe `NetworkMonitor`. Sugestões:
+### 2.2. Refactoring Long Functions
+* **Objective:** Increase clarity and modularity of the `update_display_and_status` function (which will become a class method).
+* **Target Method:** `NetworkMonitor.update_display_and_status` (after refactoring 2.1).
+* **Steps:**
+    * [ ] Analyze the `update_display_and_status` method and identify distinct logical blocks.
+    * [ ] For each block, create a new private method (prefixed with an underscore) within the `NetworkMonitor` class. Suggestions:
         * `_display_status_message(self)`
-        * `_prepare_plot_area(self)` (para obter tamanho do terminal, calcular `plot_height`, `plot_width`)
+        * `_prepare_plot_area(self)` (to get terminal size, calculate `plot_height`, `plot_width`)
         * `_configure_plot_axes_and_labels(self)`
-        * `_plot_latency_series(self)` (para `pltx.plot` e `pltx.scatter`)
-        * `_render_plot(self)` (para `pltx.show()`)
+        * `_plot_latency_series(self)` (for `pltx.plot` and `pltx.scatter`)
+        * `_render_plot(self)` (for `pltx.show()`)
         * `_display_statistics(self)`
-    * [ ] O método `update_display_and_status` original chamará esses novos métodos privados em sequência.
+    * [ ] The original `update_display_and_status` method will call these new private methods in sequence.
 
-## Fase 3: Funcionalidades e Robustez
+## Phase 3: Features and Robustness
 
-### 3.1. Aprimoramento do Tratamento de Erros e Logging
-* **Objetivo:** Implementar um sistema de logging mais flexível e estruturado.
-* **Arquivo Principal:** `monitor_net.py`
-* **Passos:**
-    * [ ] Importar o módulo `logging` do Python.
-    * [ ] Configurar um logger básico no início do script ou no `__init__` da classe `NetworkMonitor` (ex: `logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')`).
-    * [ ] Substituir chamadas de `print()` e `sys.stdout.write()` usadas para mensagens de status, avisos e erros por chamadas ao logger (ex: `logger.info()`, `logger.warning()`, `logger.error()`, `logger.critical()`, `logger.debug()`).
-    * [ ] Revisar o tratamento da exceção `FileNotFoundError` para o comando `ping` para garantir que a mensagem seja clara e registrada adequadamente através do logger, evitando duplicação.
+### 3.1. Enhanced Error Handling and Logging
+* **Objective:** Implement a more flexible and structured logging system.
+* **Main File:** `monitor_net.py`
+* **Steps:**
+    * [ ] Import Python's `logging` module.
+    * [ ] Configure a basic logger at the beginning of the script or in the `NetworkMonitor` class's `__init__` (e.g., `logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')`).
+    * [ ] Replace `print()` and `sys.stdout.write()` calls used for status messages, warnings, and errors with logger calls (e.g., `logger.info()`, `logger.warning()`, `logger.error()`, `logger.critical()`, `logger.debug()`).
+    * [ ] Review the `FileNotFoundError` exception handling for the `ping` command to ensure the message is clear and logged appropriately via the logger, avoiding duplication.
 
-### 3.2. Clareza na Lógica de Plotagem de Falhas (Revisão)
-* **Objetivo:** Assegurar que a lógica para representar falhas no gráfico seja clara e bem documentada.
-* **Arquivo Principal:** `monitor_net.py`
-* **Passos:**
-    * [ ] Revisar e adicionar comentários detalhados explicando por que `latency_plot_values` usa `0` para falhas e `latency_history_real_values` usa `None`, e como ambos são usados na plotagem.
-    * [ ] (Opcional) Considerar se uma estrutura de dados unificada para cada ponto de histórico (ex: um `collections.namedtuple` ou uma pequena classe `DataPoint` com atributos como `real_value` e `plot_value`) simplificaria a lógica ou melhoraria a legibilidade. Se não houver um benefício claro, manter a estrutura atual com bons comentários.
+### 3.2. Clarity in Failure Plotting Logic (Review)
+* **Objective:** Ensure that the logic for representing failures on the graph is clear and well-documented.
+* **Main File:** `monitor_net.py`
+* **Steps:**
+    * [ ] Review and add detailed comments explaining why `latency_plot_values` uses `0` for failures and `latency_history_real_values` uses `None`, and how both are used in plotting.
+    * [ ] (Optional) Consider if a unified data structure for each history point (e.g., a `collections.namedtuple` or a small `DataPoint` class with attributes like `real_value` and `plot_value`) would simplify logic or improve readability. If there's no clear benefit, maintain the current structure with good comments.
 
-### 3.3. Revisão de Docstrings e Comentários
-* **Objetivo:** Garantir que todo o código seja bem documentado.
-* **Arquivo Principal:** `monitor_net.py`
-* **Passos:**
-    * [ ] Percorrer todas as classes e métodos/funções.
-    * [ ] Escrever ou atualizar docstrings para cada um, explicando seu propósito, argumentos (tipos e descrição), o que retorna, e quaisquer exceções que pode levantar. Usar um formato padrão (ex: reStructuredText ou Google style).
-    * [ ] Adicionar/revisar comentários inline para seções de código complexas ou lógicas não óbvias.
+### 3.3. Review of Docstrings and Comments
+* **Objective:** Ensure all code is well-documented.
+* **Main File:** `monitor_net.py`
+* **Steps:**
+    * [ ] Go through all classes and methods/functions.
+    * [ ] Write or update docstrings for each, explaining its purpose, arguments (types and description), what it returns, and any exceptions it might raise. Use a standard format (e.g., reStructuredText or Google style).
+    * [ ] Add/review inline comments for complex code sections or non-obvious logic.
 
-## Fase 4: Testes e Manutenção
+## Phase 4: Testing and Maintenance
 
-### 4.1. Implementação de Testes Automatizados
-* **Objetivo:** Criar um conjunto de testes para garantir a corretude do código e facilitar refatorações futuras.
-* **Ferramentas:** `unittest` (padrão) ou `pytest`.
-* **Passos:**
-    * [ ] Escolher um framework de testes (`pytest` é geralmente recomendado por sua simplicidade).
-    * [ ] Criar um diretório de testes (ex: `tests/`).
-    * [ ] Configurar o ambiente para rodar os testes.
-    * [ ] Escrever testes unitários para:
-        * O método de parsing da saída do `ping` (dentro de `measure_latency`), cobrindo diferentes formatos de saída válidos, casos de falha, e timeouts. (Isso pode exigir mockar `subprocess.run`).
-        * Funções/métodos que realizam cálculos de estatísticas.
-        * Validação de argumentos da CLI.
-        * (Se classe for implementada) Testar a inicialização da classe e a lógica de seus métodos principais.
-    * [ ] Considerar testes de integração simples que simulam a execução do monitor por alguns ciclos (pode ser mais complexo).
-    * [ ] Integrar a execução dos testes em um script ou Makefile.
+### 4.1. Implementation of Automated Tests
+* **Objective:** Create a test suite to ensure code correctness and facilitate future refactorings.
+* **Tools:** `unittest` (standard) or `pytest`.
+* **Steps:**
+    * [ ] Choose a testing framework (`pytest` is generally recommended for its simplicity).
+    * [ ] Create a test directory (e.g., `tests/`).
+    * [ ] Set up the environment to run tests.
+    * [ ] Write unit tests for:
+        * The `ping` output parsing method (within `measure_latency`), covering different valid output formats, failure cases, and timeouts. (This may require mocking `subprocess.run`).
+        * Functions/methods that perform statistical calculations.
+        * CLI argument validation.
+        * (If a class is implemented) Test class initialization and the logic of its main methods.
+    * [ ] Consider simple integration tests that simulate running the monitor for a few cycles (can be more complex).
+    * [ ] Integrate test execution into a script or Makefile.
 
-### 4.2. Melhorias no Script `run_monitor.sh` (Menor)
-* **Objetivo:** Pequenos ajustes para robustez.
-* **Arquivo Principal:** `run_monitor.sh`
-* **Passos:**
-    * [ ] (Opcional) Adicionar uma verificação se o arquivo `REQUIREMENTS_FILE` (`requirements.txt`) está vazio antes de chamar `pip install -r`. Se estiver vazio, talvez pular o passo de instalação ou emitir uma mensagem. O `pip` geralmente lida bem com isso, então é de baixa prioridade.
+### 4.2. Improvements to `run_monitor.sh` Script (Minor)
+* **Objective:** Small adjustments for robustness.
+* **Main File:** `run_monitor.sh`
+* **Steps:**
+    * [ ] (Optional) Add a check if the `REQUIREMENTS_FILE` (`requirements.txt`) is empty before calling `pip install -r`. If empty, perhaps skip the installation step or issue a message. `pip` usually handles this well, so it's low priority.
 
-## Considerações Adicionais
-* **Controle de Versão:** Usar Git e fazer commits pequenos e descritivos para cada passo ou grupo lógico de mudanças.
-* **Branches:** Considerar o uso de feature branches para melhorias maiores (ex: refatoração para classe, implementação de testes).
-* **Revisão de Código:** Se possível, ter outra pessoa revisando as mudanças.
+## Additional Considerations
+* **Version Control:** Use Git and make small, descriptive commits for each step or logical group of changes.
+* **Branches:** Consider using feature branches for major improvements (e.g., refactoring to a class, implementing tests).
+* **Code Review:** If possible, have someone else review the changes.
 
-Este roadmap é uma sugestão e pode ser ajustado conforme necessário. Recomenda-se focar primeiro nas melhorias que trarão maior impacto na organização e manutenibilidade do código.
+This roadmap is a suggestion and can be adjusted as needed. It is recommended to first focus on improvements that will have the greatest impact on code organization and maintainability.
